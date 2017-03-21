@@ -8,10 +8,10 @@ class LogPlugin(p.Plugin):
         for pname in [ 'syslogd', 'rsyslogd', 'syslog-ng', 'systemd-journald' ]:
             pid = ps.check_process(pname)
             if pid:
-                co.display_test_ok('Log Process %s found' % pname)
+                self.info('Log Process %s found' % pname)
                 return
 
-        co.display_test_error('No Process found for log processing')
+        self.error('No Process found for log processing')
 
     def checkLogrotate(self, plugins_output):
         '''Check if logrotate is installed and running.
@@ -19,6 +19,6 @@ class LogPlugin(p.Plugin):
            by logrotate'''
         res = ps.managed_by_cron('logrotate')
         if not res:
-            co.display_test_error('logrotate not called by cron job')
+            self.error('logrotate not called by cron job')
         else:
-            co.display_test_ok('logrotate called in cron file %s' % res[0])
+            self.info('logrotate called in cron file %s' % res[0])

@@ -10,13 +10,13 @@ class SshdPlugin(p.Plugin):
                 if mobj:
                     sshd_versions = mobj.groups()[0].split(',')
                     if '1' in sshd_versions:
-                        co.display_test_error('Protocol Version 1 should never be allowed')
+                        self.error('Protocol Version 1 should never be allowed')
 
                 mob = re.match('PermitRootLogin[ \t]+yes', line, re.IGNORECASE)
                 if mobj:
-                    co.display_test_error("PermitRootLogin should be set to 'no'")
+                    self.error("PermitRootLogin should be set to 'no'")
 
                 mob = re.match('PasswordAuthentication[ \t]+yes', line, re.IGNORECASE)
                 if mobj:
-                    co.display_test_error("PasswordAuthentication should be set to 'no'")
+                    self.error("PasswordAuthentication should be set to 'no'")
 

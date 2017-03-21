@@ -24,9 +24,9 @@ PERM_STICKYBIT = 1 << 9
 
 def check_perms(filename, attrs):
     '''Check filename towards owner, group and perms given in attrs dictionary.'''
-    co.display_begin_test('check_perms(%s)' % filename)
+    co.begin_test('check_perms(%s)' % filename)
     if not os.path.exists(filename):
-        co.display_test_error('File %s does not exist' % filename)
+        co.test_error('File %s does not exist' % filename)
         return
 
     try:
@@ -36,19 +36,47 @@ def check_perms(filename, attrs):
         if 'owner' in attrs:
             if type(attrs['owner']) == str:
                 if attrs['owner'] == MUST_BE_ROOT and uid != 0:
-                    co.display_test_error('Owner mismatch: wanted %s, got %d' % (attrs['owner'], uid))
+                    co.test_error('Owner mismatch: wanted %s, got %d' % (attrs['owner'], uid))
                 elif attrs['owner'] == MUST_NOT_BE_ROOT and uid == 0:
-                    co.display_test_error('Owner mismatch: wanted %s, got %d' % (attrs['owner'], uid))
+                    co.test_error('Owner mismatch: wanted %s, got %d' % (attrs['owner'], uid))
             elif attrs['owner'] != uid:
-                co.display_test_error('Owner mismatch: wanted %d, got %d' % (attrs['owner'], uid))
+                co.test_error('Owner mismatch: wanted %d, got %d' % (attrs['owner'], uid))
 
         if 'no_perms' in attrs:
             if mode & attrs['no_perms']:
-                co.display_test_error('Perms mismatch: %o perms must be excluded, but perms %o found' % (attrs['no_perms'], mode))
+                co.test_error('Perms mismatch: %o perms must be excluded, but perms %o found' % (attrs['no_perms'], mode))
 
         if 'perms' in attrs:
             if not (mode & attrs['perms']):
-                co.display_test_error('Perms mismatch: %o perms must be included, but perms %o found' % (attrs['perms'], mode))
+                co.test_error('Perms mismatch: %o perms must be included, but perms %o found' % (attrs['perms'], mode))
 
     except Exception as exc:
         co.display_err('check_perms failed: %s' % exc)
+
+
+def get_kernel_parm(name):
+    '''Read the given kernel parameter value, from /proc/sys.
+
+    Parameter name form is : xxx.yyy.zzz
+    '''
+    try:
+        fname = name.replace('.', '/')
+        with open('/proc/sys/' + fname) as f:
+            return f.readline().strip()
+    except:
+        co.display('Kernel Parameter %s not found' % name)
+
+    return None
+
+
+def check_kernel_parm(name, expected_value):
+    '''Check the kernel parameter value'''
+    value = get_kernel_parm(name)
+    if not value:
+        return None
+
+    if int(value) != expected_value:
+        co.test_error("Kernel Parameter '%s' value should be %d instead of %d" % (name, expected_value, int(value)))
+        return False
+
+    return True

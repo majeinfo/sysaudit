@@ -7,6 +7,7 @@ if vers.major < 3 and vers.minor < 7:
     print 'Python Version must be >= 2.7'
     sys.exit(1)
 
+import plugin
 import inspect
 from include import compat as co
 import sysstore
@@ -42,8 +43,8 @@ def load_plugin_file(plugin_name):
         return None
 
     for member, obj in inspect.getmembers(mod):
-        if inspect.isclass(obj):
-            return obj()    # TODO: devrait tester que derive de Plugin
+        if inspect.isclass(obj) and issubclass(obj, plugin.Plugin):
+            return obj()
 
     return None
 
@@ -60,7 +61,10 @@ for fname in sorted(list(glob.glob(full_cur_dir + 'plugins/*.py'))):
             else:
                 for attr, value in inspect.getmembers(plg):
                     if inspect.ismethod(value) and attr.startswith('check'):
+                        #co.begin_test('Execute: ' + attr)
+                        plg.begin(attr)
                         value(plugins_output)
+                        plg.end()
                 plugins_output[plugin_name] = plg.output
 
     except Exception as exc:
