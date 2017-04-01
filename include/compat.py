@@ -24,7 +24,7 @@ def display(*args):
 
 
 def display_plugin(plugin_name):
-    if not silent: display(color_cya.format('PLUGIN>'), bold.format(plugin_name))
+    if True or not silent: display(color_cya.format('PLUGIN>'), bold.format(plugin_name))
 
 
 def display_err(*args):
@@ -36,11 +36,11 @@ def begin_test(*args):
 
 
 def end_test_ok(*args):
-    print(':', color_grn.format('OK'), *args)
+    if not silent: print(':', color_grn.format('OK'), *args)
 
 
 def end_test_failed(*args):
-    print(':', color_red.format('FAILED'), *args)
+    if not silent: print(':', color_red.format('FAILED'), *args)
 
 
 def display_ok(msg, indent=False):

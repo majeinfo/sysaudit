@@ -26,6 +26,11 @@ MSG_WARN = 2
 MSG_ERR = 3
 
 class Plugin(object):
+
+    total_errors = 0
+    total_warnings = 0
+    total_infos = 0
+
     def __init__(self):
         co.debug('Plugin run')
         self.output = {}
@@ -39,13 +44,16 @@ class Plugin(object):
         self.msgs.append((MSG_OK, msg))
 
     def info(self, msg):
+        Plugin.total_infos += 1
         self.msgs.append((MSG_INFO, msg))
 
     def warning(self, msg):
+        Plugin.total_warnings += 1
         self.msgs.append((MSG_WARN, msg))
 
     def error(self, msg):
         self.errors += 1
+        Plugin.total_errors += 1
         self.msgs.append((MSG_ERR, msg))
 
     def end(self):

@@ -18,6 +18,7 @@ import argparse
 # 1-analysis of command line
 parser = argparse.ArgumentParser(description='Audit Tool for Linux System')
 parser.add_argument('-s', '--silent', default=False, action='store_true', help='Display Errors only')
+parser.add_argument('-p', '--plugin', default=None, action='store_plugins', help='Plugin to activate')
 args = parser.parse_args()
 co.config(args)
 
@@ -63,7 +64,11 @@ for fname in sorted(list(glob.glob(full_cur_dir + 'plugins/*.py'))):
                     if inspect.ismethod(value) and attr.startswith('check'):
                         #co.begin_test('Execute: ' + attr)
                         plg.begin(attr)
-                        value(plugins_output)
+                        (args, varargs, keywords, defaults) = inspect.getargspec(value)
+                        if 'plugins_output' in args:
+                            value(plugins_output)
+                        else:
+                            value()
                         plg.end()
                 plugins_output[plugin_name] = plg.output
 
@@ -77,5 +82,9 @@ for fname in sorted(list(glob.glob(full_cur_dir + 'plugins/*.py'))):
 conf = sysstore.SysStore('conf.json')
 my_hostname = socket.gethostname().split('.')[0]
 print(plugins_output)
+
+# Display global Statistics:
+print('TOTAL WARNINGS:', plugin.Plugin.total_warnings)
+print('TOTAL ERRORS:', plugin.Plugin.total_errors)
 
 # EOF
