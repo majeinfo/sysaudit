@@ -22,7 +22,7 @@ PERM_STICKYBIT = 1 << 9
 
 # TODO: write a function that convert octal to symbolic perms
 
-def check_perms(filename, attrs):
+def _check_perms(filename, attrs):
     '''Check filename towards owner, group and perms given in attrs dictionary.'''
     co.begin_test('check_perms(%s)' % filename)
     if not os.path.exists(filename):
@@ -54,7 +54,7 @@ def check_perms(filename, attrs):
         co.display_err('check_perms failed: %s' % exc)
 
 
-def get_kernel_parm(name):
+def _get_kernel_parm(name):
     '''Read the given kernel parameter value, from /proc/sys.
 
     Parameter name form is : xxx.yyy.zzz
@@ -69,9 +69,9 @@ def get_kernel_parm(name):
     return None
 
 
-def check_kernel_parm(name, expected_value):
+def _check_kernel_parm(name, expected_value):
     '''Check the kernel parameter value'''
-    value = get_kernel_parm(name)
+    value = _get_kernel_parm(name)
     if not value:
         return None
 

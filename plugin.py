@@ -1,4 +1,6 @@
 import os
+import re
+import glob
 from include import compat as co
 
 MUST_BE_ROOT = 'must_root'
@@ -24,6 +26,7 @@ MSG_OK = 0
 MSG_INFO = 1
 MSG_WARN = 2
 MSG_ERR = 3
+MSG_IGNORE = 4
 
 class Plugin(object):
 
@@ -38,6 +41,7 @@ class Plugin(object):
     def begin(self, func_name):
         self.errors = 0
         self.msgs = []
+        self._ignore = False
         co.begin_test('Execute: ' + func_name)
 
     def ok(self, msg=''):
@@ -56,10 +60,17 @@ class Plugin(object):
         Plugin.total_errors += 1
         self.msgs.append((MSG_ERR, msg))
 
+    def ignore(self):
+        self._ignore = True
+        self.msgs.append((MSG_IGNORE, None))
+
     def end(self):
         # Compute the final result
         if not self.errors:
-            co.end_test_ok()
+            if self._ignore:
+                co.end_test_ignore()
+            else:
+                co.end_test_ok()
         else:
             co.end_test_failed()
 
@@ -68,6 +79,7 @@ class Plugin(object):
             elif level == MSG_INFO: co.display_info(msg)
             elif level == MSG_WARN: co.display_warning(msg)
             elif level == MSG_ERR: co.display_err(msg)
+            elif level == MSG_IGNORE: pass
             else: co.display_err('UNKNOWN MSG LEVEL')
 
 
@@ -130,3 +142,53 @@ class Plugin(object):
             return False
 
         return True
+
+
+    def _check_process(self, process_name, multi=False):
+        '''Returns the PID of the specified process or False if not found.
+           In case of multiple processes, returns only the 1st PID'''
+        try:
+            procs = os.popen("ps -e | grep -i '%s' | grep -v grep" % process_name).read()
+            lines = procs.strip().split('\n')
+            if len(lines) < 1: return False
+            for line in lines:
+                if not line: continue
+                cols = re.split('[ \t]+', line.strip())
+                if len(cols) and cols[3] == process_name:
+                    return int(cols[0])      # return PID
+        except Exception as exc:
+            self.error('os.popen failed: %s' % exc)
+
+        return False
+
+
+    def _managed_by_cron(self, process_name, is_system=True):
+        '''Returns a tuple with the filename and the command
+           that launches the specified process from crontab.
+           Returns () in not found'''
+        pat = re.compile(process_name)
+
+        def _search(name, re_process):
+            '''Search pe_process in name file or name directory'''
+            if os.path.isdir(name):
+                for f in glob.glob(name + '/*'):
+                    res = _search(f, re_process)
+                    if res: return res
+
+            # Search in a file
+            if not os.path.isfile(name):
+                return ()
+
+            with open(name) as f:
+                for line in f:
+                    if pat.search(line): return (name, re_process)
+
+            return ()
+
+        names = ('/etc/crontab', '/etc/cron.d', '/etc/cron.hourly', '/etc/cron.daily', '/etc/cron.weekly', '/etc/cron.monthly')
+        for n in names:
+            res = _search(n, process_name)
+            if res: return res
+
+        return ()
+

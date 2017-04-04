@@ -1,5 +1,4 @@
 import plugin as p
-from include import compat as co
 from include import fileutil as fu
 
 class PermissionsPlugin(p.Plugin):

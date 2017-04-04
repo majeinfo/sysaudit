@@ -1,7 +1,4 @@
 import plugin as p
-from include import compat as co
-from include import fileutil as fu
-import re
 
 class KernelPlugin(p.Plugin):
     def checkParms(self, plugins_output):

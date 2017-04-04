@@ -1,6 +1,4 @@
 import plugin as p
-from include import compat as co
-import re
 import os
 
 class SystemPlugin(p.Plugin):

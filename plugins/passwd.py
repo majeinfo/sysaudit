@@ -4,8 +4,6 @@ from include import fileutil as fu
 import pwd, spwd
 
 class PasswordPlugin(p.Plugin):
-    # TODO: check password policy
-
     def check_files(self, plugins_output):
         self._check_perms('/etc/passwd', { 'owner': fu.MUST_BE_ROOT, 'group': fu.MUST_BE_ROOT, 'no_perms': fu.PERM_WRITE_OTHER })
         self._check_perms('/etc/shadow', {'owner': fu.MUST_BE_ROOT, 'group': fu.MUST_BE_ROOT, 'no_perms': fu.PERM_ANY_OTHER })
@@ -17,4 +15,6 @@ class PasswordPlugin(p.Plugin):
             if sp_pwd == '':
                 self.error('User %s has an empty password' % pw_name)
 
-
+    def check_password_policy(self):
+        # TODO: check password policy
+        pass

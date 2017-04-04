@@ -2,8 +2,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import sys
 
-# TODO: ajouter de la couleur...
-
 debug_flag = False
 silent = False
 py_major, py_minor = sys.version_info[:2]
@@ -38,6 +36,10 @@ def begin_test(*args):
 
 def end_test_ok(*args):
     if not silent: print(':', color_grn.format('OK'), *args)
+
+
+def end_test_ignore(*args):
+    if not silent: print(':', color_grn.format('-- ignored --'), *args)
 
 
 def end_test_failed(*args):

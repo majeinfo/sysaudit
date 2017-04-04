@@ -4,10 +4,9 @@ import re
 import glob
 from include import compat as co
 
-def check_process(process_name, multi=False):
+def _check_process(process_name, multi=False):
     '''Returns the PID of the specified process or False if not found.
        In case of multiple processes, returns only the 1st PID'''
-    # TODO: add a flag for multiple PID
     try:
         procs = os.popen("ps -e | grep -i '%s' | grep -v grep" % process_name).read()
         lines = procs.strip().split('\n')
@@ -22,7 +21,7 @@ def check_process(process_name, multi=False):
 
     return False
 
-def managed_by_cron(process_name, is_system=True):
+def _managed_by_cron(process_name, is_system=True):
     '''Returns a tuple with the filename and the command
        that launches the specified process from crontab.
        Returns () in not found'''
