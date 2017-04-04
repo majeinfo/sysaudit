@@ -12,6 +12,7 @@ bold = "\033[1m{0}\033[0m"
 color_red = "\033[1;31m{0}\033[00m"
 color_cya = "\033[1;36m{0}\033[00m"
 color_grn = "\033[1;32m{0}\033[00m"
+color_yel = "\033[1;33m{0}\033[00m"
 
 
 def config(args):
@@ -52,7 +53,7 @@ def display_info(msg, indent=False):
 
 
 def display_warning(msg, indent=False):
-    if not silent: print('\t' if indent else '', color_grn.format('WARN'), msg)
+    if not silent: print('\t' if indent else '', color_yel.format('WARN'), msg)
 
 
 def display_err(msg, indent=False):

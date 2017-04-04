@@ -18,9 +18,9 @@ import argparse
 # 1-analysis of command line
 parser = argparse.ArgumentParser(description='Audit Tool for Linux System')
 parser.add_argument('-s', '--silent', default=False, action='store_true', help='Display Errors only')
-parser.add_argument('-p', '--plugin', default=None, action='store_plugins', help='Plugin to activate')
-args = parser.parse_args()
-co.config(args)
+parser.add_argument('-p', '--plugin', nargs=1, default=None, action='store', help='Plugin to activate')
+cmd_args = parser.parse_args()
+co.config(cmd_args)
 
 # Global init
 plugins_output = {}
@@ -52,7 +52,13 @@ def load_plugin_file(plugin_name):
 
 for fname in sorted(list(glob.glob(full_cur_dir + 'plugins/*.py'))):
     plugin_name = os.path.basename(fname).split('.')[0]
+
+    # Check if plugin must be run
+    if cmd_args.plugin and plugin_name not in cmd_args.plugin:
+        continue
+
     plg = load_plugin_file(plugin_name)
+
     # 3-run audit
     try:
         if plg:
