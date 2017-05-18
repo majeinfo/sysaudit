@@ -24,7 +24,7 @@ class DNSClientPlugin(p.Plugin):
                 mobj = re.match('search[ \t]+(.*)', line, re.IGNORECASE)
                 if mobj:
                     self.dns_search = re.split('[ \t]+', mobj.groups()[0])
-                    self.output['dsn_search'] = re.split('[ \t]+', mobj.groups()[0])
+                    self.output['dns_search'] = re.split('[ \t]+', mobj.groups()[0])
 
 
 

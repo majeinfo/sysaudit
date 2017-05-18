@@ -1,3 +1,4 @@
+import re
 import plugin as p
 
 class LogPlugin(p.Plugin):
@@ -26,4 +27,9 @@ class LogPlugin(p.Plugin):
     def check_log_server(self):
         '''Check if the logs are redirected to a log server'''
         # TODO
+        '''
+        mobj = re.match('rocommunity[ \t]+public[ \t]+', line, re.IGNORECASE)
+        if mobj:
+            self.warning("rocommunity 'public' found")
+        '''
         pass

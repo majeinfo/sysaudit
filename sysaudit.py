@@ -24,6 +24,9 @@ co.config(cmd_args)
 
 # Global init
 plugins_output = {}
+g_plugins_count = 0
+g_plugins_run_count = 0
+g_tests_count = 0
 
 if sys.argv[0][0] == '/':
     full_cur_dir = os.path.dirname(sys.argv[0]) + os.sep
@@ -49,8 +52,9 @@ def load_plugin_file(plugin_name):
 
     return None
 
-
+# Loop on Plugins
 for fname in sorted(list(glob.glob(full_cur_dir + 'plugins/*.py'))):
+    g_plugins_count += 1
     plugin_name = os.path.basename(fname).split('.')[0]
 
     # Check if plugin must be run
@@ -62,13 +66,16 @@ for fname in sorted(list(glob.glob(full_cur_dir + 'plugins/*.py'))):
     # 3-run audit
     try:
         if plg:
+            g_plugins_run_count += 1
             if getattr(plg, 'run', None):
+                # unused
                 plg.run(plugins_output)
                 plugins_output[plugin_name] = plg.output
             else:
                 for attr, value in inspect.getmembers(plg):
                     if inspect.ismethod(value) and attr.startswith('check'):
                         #co.begin_test('Execute: ' + attr)
+                        g_tests_count += 1
                         plg.begin(attr)
                         (args, varargs, keywords, defaults) = inspect.getargspec(value)
                         if 'plugins_output' in args:
@@ -90,6 +97,9 @@ my_hostname = socket.gethostname().split('.')[0]
 print(plugins_output)
 
 # Display global Statistics:
+print('TOTAL PLUGINS:', g_plugins_count)
+print('TOTAL PLUGINS RUN:', g_plugins_run_count)
+print('TOTAL TESTS:', g_tests_count)
 print('TOTAL WARNINGS:', plugin.Plugin.total_warnings)
 print('TOTAL ERRORS:', plugin.Plugin.total_errors)
 
