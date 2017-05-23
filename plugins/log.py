@@ -31,7 +31,7 @@ class LogPlugin(p.Plugin):
 
     def check_log_server(self):
         '''Check if the logs are redirected to a log server'''
-        # configurtion depends on log process
+        # configuration depends on log process
         if self.output[LOG_PROCESS] == 'rsyslogd':
             for f in [ '/etc/rsyslog.conf', '/etc/rsyslog.d/rsyslog.conf' ]:
                 if os.path.isfile(f):
