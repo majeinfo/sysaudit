@@ -4,7 +4,7 @@ import os
 import sys
 vers = sys.version_info
 if vers.major < 3 and vers.minor < 7:
-    print 'Python Version must be >= 2.7'
+    print('Python Version must be >= 2.7')
     sys.exit(1)
 
 import plugin
